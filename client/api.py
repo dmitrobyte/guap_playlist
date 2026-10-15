@@ -26,7 +26,13 @@ class ApiClient:
         self.base_url = base_url
         if self._http:
             self._http.close()
-        self._http = httpx.Client(base_url=base_url, timeout=httpx.Timeout(15.0, read=120.0))
+        # The app normally talks directly to a server on this PC or local network.
+        # Do not let a system HTTP_PROXY redirect that traffic and return an unrelated 503.
+        self._http = httpx.Client(
+            base_url=base_url,
+            timeout=httpx.Timeout(15.0, read=120.0),
+            trust_env=False,
+        )
 
     # ------------------------------------------------------------ общий запрос
     def _headers(self) -> dict:
